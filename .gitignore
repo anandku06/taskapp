@@ -1,0 +1,15 @@
+# Go build files
+*.exe
+*.out
+*.test
+/tmp/
+
+# Air temp binary
+tmp/
+
+# IDE/editor files
+.vscode/
+*.swp
+
+# Dependency cache
+vendor/
