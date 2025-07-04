@@ -1,15 +1,47 @@
-# Go build files
+# Go build artifacts
 *.exe
-*.out
+*.exe~
+*.dll
+*.so
+*.dylib
 *.test
-/tmp/
+*.out
 
-# Air temp binary
+# Output and temp directories
+/tmp/
 tmp/
 
-# IDE/editor files
-.vscode/
-*.swp
-
-# Dependency cache
+# Dependency directories
 vendor/
+
+# Environment files
+.env
+.env.*
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Air live reload config
+.air/
+air.toml
+
+# Node modules (if using frontend)
+node_modules/
+client/node_modules/
+
+# Coverage files
+coverage.*
+*.coverprofile
+
+# Backup files
+*~
