@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -36,6 +37,8 @@ func main() {
 		log.Fatal(err)
 	}
 
+	defer client.Disconnect(context.Background())
+
 	err = client.Ping(context.Background(), nil)
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +64,26 @@ func main() {
 }
 
 func getTodos(c *fiber.Ctx) error {
+	var todos []Todo
 
+	cursor, err := collection.Find(context.Background(), bson.M{})
+
+	if err != nil {
+		return err
+	}
+
+	defer cursor.Close(context.Background())
+
+	for cursor.Next(context.Background()) {
+		var todo Todo
+		if err := cursor.Decode(&todo); err != nil {
+			return err
+		}
+
+		todos = append(todos, todo)
+	}
+
+	return c.JSON(todos)
 }
 // func createTodos(c *fiber.Ctx) error {}
 // func updateTodos(c *fiber.Ctx) error {}
