@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type Todo struct {
@@ -15,67 +18,51 @@ type Todo struct {
 	Body      string `json : "body"`
 }
 
-func main() {
-	fmt.Println("Hello, World!")
-	app := fiber.New()
+var collection *mongo.Collection
 
-	todos := []Todo{}
+func main() {
+	fmt.Println("Hello World!!")
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading the .env file")
+		log.Fatal("Error loading .env file", err)
 	}
 
-	PORT := os.Getenv("PORT")
+	mongoDB := os.Getenv("MONGODB_URI")
+	clientOptions := options.Client().ApplyURI(mongoDB)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 
-	app.Get("/api/todos", func(c *fiber.Ctx) error {
-		return c.Status(200).JSON(todos)
-	})
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	// create a todo
-	app.Post("/api/todos", func(c *fiber.Ctx) error {
-		todo := &Todo{}
+	err = client.Ping(context.Background(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		if err := c.BodyParser(todo); err != nil {
-			return err
-		}
+	fmt.Println("Connected to MongoDB!!")
 
-		if todo.Body == "" {
-			return c.Status(400).JSON(fiber.Map{"error": "ToDo body is required"})
-		}
+	collection = client.Database("task").Collection("todos")
 
-		todo.ID = len(todos) + 1
-		todos = append(todos, *todo)
+	app := fiber.New()
 
-		return c.Status(201).JSON(todo)
-	})
+	app.Get("/api/todos", getTodos)
+	// app.Post("/api/todos", createTodos)
+	// app.Patch("/api/todos/:id", updateTodos)
+	// app.Delete("/api/todos/:id", deleteTodos)
 
-	// update a todo
-	app.Patch("/api/todos/:id", func(c *fiber.Ctx) error {
-		id := c.Params("id")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "4000"
+	}
 
-		for i, todo := range todos {
-			if fmt.Sprint(todo.ID) == id {
-				todos[i].Completed = true
-				return c.Status(200).JSON(todos[i])
-			}
-		}
-
-		return c.Status(404).JSON(fiber.Map{"error": "Todo not found!"})
-	})
-
-	// delete a todo
-	app.Delete("/api/todos/:id", func(c *fiber.Ctx) error {
-		id := c.Params("id")
-
-		for i, todo := range todos {
-			if fmt.Sprint(todo.ID) == id {
-				todos = append(todos[:i], todos[i+1:]...)
-				return c.Status(200).JSON(fiber.Map{"success": true})
-			}
-		}
-		return c.Status(404).JSON(fiber.Map{"error": "Todo not found!"})
-	})
-
-	log.Fatal(app.Listen(":" + PORT))
+	log.Fatal(app.Listen("0.0.0.0:" + port))
 }
+
+func getTodos(c *fiber.Ctx) error {
+
+}
+// func createTodos(c *fiber.Ctx) error {}
+// func updateTodos(c *fiber.Ctx) error {}
+// func deleteTodos(c *fiber.Ctx) error {}
