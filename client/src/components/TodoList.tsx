@@ -3,7 +3,7 @@ import { Flex, Spinner, Stack, Text } from "@chakra-ui/react";
 import TodoItem from "./TodoItem";
 
 const TodoList = () => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const todos = [
     {
       _id: 1,
@@ -34,6 +34,8 @@ const TodoList = () => {
         fontWeight={"bold"}
         textAlign={"center"}
         my={2}
+        bgGradient="linear(to-l, #0b85f8, #00ffff)"
+        bgClip="text"
       >
         Today's Tasks
       </Text>
