@@ -9,23 +9,23 @@ export type Todo = {
 };
 
 const TodoList = () => {
-  const {data : todos, isLoading} = useQuery<Todo[]>({
-    queryKey : ["todos"],
-    queryFn : async () => {
+  const { data: todos, isLoading } = useQuery<Todo[]>({
+    queryKey: ["todos"],
+    queryFn: async () => {
       try {
-        const res = await fetch("http://localhost:4000/api/todos")
-        const data = await res.json()
+        const res = await fetch("http://localhost:4000/api/todos");
+        const data = await res.json();
 
-        if(!res.ok) {
-          throw new Error(data.error || "Something went wrong!")
+        if (!res.ok) {
+          throw new Error(data.error || "Something went wrong!");
         }
 
-        return data || []
+        return data || [];
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
-    }
-  })
+    },
+  });
   return (
     <>
       <Text

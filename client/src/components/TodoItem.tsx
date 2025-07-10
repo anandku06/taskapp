@@ -52,9 +52,9 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
         console.log(error);
       }
     },
-    onSuccess : () => {
-      queryClient.invalidateQueries({queryKey : ["todos"]})
-    }
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
   });
   return (
     <Flex gap={2} alignItems={"center"}>
