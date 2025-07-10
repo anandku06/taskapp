@@ -26,9 +26,11 @@ var collection *mongo.Collection
 func main() {
 	fmt.Println("Hello World!!")
 
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
+	if os.Getenv("ENV") != "production" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file", err)
+		}
 	}
 
 	mongoDB := os.Getenv("MONGODB_URI")
@@ -52,10 +54,14 @@ func main() {
 
 	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{
-		AllowOrigins: "http://localhost:5173",
-		AllowHeaders: "Origin, Content-Type, Accept",
-	}))
+	if os.Getenv("ENV") == "development" {
+		app.Use(cors.New(cors.Config{
+			AllowOrigins: "http://localhost:5173",
+			AllowHeaders: "Origin, Content-Type, Accept",
+		}))
+	} else {
+		app.Static("/", "./client/dist")
+	}
 
 	app.Get("/api/todos", getTodos)
 	app.Post("/api/todos", createTodos)
@@ -138,15 +144,15 @@ func deleteTodos(c *fiber.Ctx) error {
 	objectId, err := primitive.ObjectIDFromHex(id)
 
 	if err != nil {
-		return c.Status(400).JSON(fiber.Map{"error" : "Invalid todo id"})
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid todo id"})
 	}
 
-	filter := bson.M{"_id" : objectId}
+	filter := bson.M{"_id": objectId}
 	_, err = collection.DeleteOne(context.Background(), filter)
 
 	if err != nil {
 		return err
 	}
 
-	return c.Status(400).JSON(fiber.Map{"success" : true})
+	return c.Status(400).JSON(fiber.Map{"success": true})
 }

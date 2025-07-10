@@ -1,4 +1,4 @@
-import { Flex, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 import TodoItem from "./TodoItem";
 import { useQuery } from "@tanstack/react-query";
 
@@ -46,7 +46,7 @@ const TodoList = () => {
       )}
       {!isLoading && todos?.length === 0 && (
         <Stack alignItems={"center"} gap={3}>
-          <Text fontSize={"xl"} textAlign={"center"} color={"gray.500"}>
+          <Text fontSize={"xl"} textAlign={"center"} color={useColorModeValue("gray.700", "gray.200")}>
             All tasks completed! 🤞
           </Text>
           <img src="/go.png" alt="Go logo" width={70} height={70} />
